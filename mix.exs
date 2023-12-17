@@ -21,6 +21,7 @@ defmodule CvmExplorer.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:explorer, "~> 0.7.1"},
       {:httpoison, "~> 2.2"},
       {:iconv, "~> 1.0"},
       {:zstream, "~> 0.6.4"}
