@@ -27,6 +27,7 @@ defmodule CvmExplorer.CadFI do
   end
 
   def dataframe() do
+    if !File.exists?(@cad_fi_store_file), do: download()
     {:ok, cad_fi} = DF.from_csv(@cad_fi_store_file, @explorer_opts)
     cad_fi
   end

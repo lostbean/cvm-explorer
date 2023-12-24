@@ -2,12 +2,14 @@ defmodule CvmExplorer do
   require Explorer.DataFrame, as: DF
   require CvmExplorer.Utils.YearMonth, as: YM
 
-  def getFIHistory() do
-    Enum.to_list(1..3)
-    |> Enum.map(fn month ->
-      IO.inspect(month)
-      CvmExplorer.DiarioFI.download(month, 2023)
-      CvmExplorer.DiarioFI.dataframe(month, 2023)
+  @spec getDiarioFIHistory(number()) :: Explorer.DataFrame.t()
+  def getDiarioFIHistory(num_months) do
+    current_ym = {2023, 11}
+
+    Enum.to_list(-num_months..0)
+    |> Enum.map(fn diff ->
+      {year, month} = YM.add(current_ym, diff)
+      CvmExplorer.DiarioFI.dataframe(month, year)
     end)
     |> DF.concat_rows()
   end

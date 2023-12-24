@@ -21,6 +21,7 @@ defmodule CvmExplorer.DiarioFI do
   def dataframe(month, year) do
     year_month = year * 100 + month
     filename = "inf_diario_fi_#{year_month}.csv"
+    if !File.exists?(filename), do: download(month, year)
     {:ok, cad_fi} = DF.from_csv(filename, @explorer_opts)
     cad_fi
   end
