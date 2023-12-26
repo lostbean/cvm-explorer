@@ -14,6 +14,17 @@ defmodule CvmExplorer.Utils.YearMonth do
     |> encode()
   end
 
+  @spec diff(integer() | {integer(), integer()}, integer() | {integer(), integer()}) :: integer()
+  def diff({yearA, monthA}, {yearB, monthB}) do
+    ymA = 12 * yearA + (monthA - 1)
+    ymB = 12 * yearB + (monthB - 1)
+    ymA - ymB
+  end
+
+  def diff(year_monthA, year_monthB) do
+    diff(decode(year_monthA), decode(year_monthB))
+  end
+
   @spec decode(integer()) :: {integer(), integer()}
   def decode(year_month) do
     year = div(year_month, 100)

@@ -57,7 +57,14 @@ defmodule CvmExplorer do
     |> DF.rename(%{to_string(target_year_month) => "target_year_month"})
     |> DF.mutate(
       for col <- across(^yms_str) do
-        {"diff_#{col.name}", (target_year_month - col) / col}
+        {"total_return_since_#{col.name}", (target_year_month - col) / col}
+      end
+    )
+    |> DF.mutate(
+      for col <- across(^yms_str) do
+        {"avg_return_since_#{col.name}",
+         (target_year_month - col) /
+           (YM.diff(^target_year_month, String.to_integer(col.name)) * col)}
       end
     )
   end
