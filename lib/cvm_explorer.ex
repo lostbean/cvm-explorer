@@ -14,10 +14,16 @@ defmodule CvmExplorer do
     |> DF.concat_rows()
   end
 
-  def deriveMetrics(diario_hist_df, target_year_month, num_months) when num_months >= 0 do
+  @spec deriveMetrics(Explorer.DataFrame.t(), integer(), list() | integer()) ::
+          Explorer.DataFrame.t()
+  def deriveMetrics(diario_hist_df, target_year_month, num_months) when is_integer(num_months) do
+    deriveMetrics(diario_hist_df, target_year_month, [num_months])
+  end
+
+  def deriveMetrics(diario_hist_df, target_year_month, num_months) when is_list(num_months) do
     date_col = "DT_COMPTC"
     id_col = "CNPJ_FUNDO"
-    reference_year_month = YM.add(target_year_month, -num_months)
+    yms = Enum.map(num_months, &YM.add(target_year_month, -&1))
 
     base =
       diario_hist_df
@@ -44,23 +50,15 @@ defmodule CvmExplorer do
         value_diff_pct: (last - first) / first
       )
 
-    d_target_ym =
-      DF.filter(monthly_stats, year_month == ^target_year_month)
-      |> DF.select([id_col, "last_date", "last"])
+    yms_str = Enum.map(yms, &to_string(&1))
 
-    d_ref_ym =
-      DF.filter(monthly_stats, year_month == ^reference_year_month)
-      |> DF.select([id_col, "first_date", "first"])
-
-    full_stats =
-      DF.join(d_target_ym, d_ref_ym)
-      |> DF.mutate(%{
-        "year_month" => 100 * year(col("last_date")) + month(col("last_date")),
-        "m#{^num_months}_value_diff_pct" => (last - first) / first
-      })
-
-    full_stats
-    |> DF.rename(first: "m#{num_months}_value", last: "ref_value")
-    |> DF.select([id_col, "m#{num_months}_value_diff_pct", "m#{num_months}_value", "ref_value"])
+    DF.filter(monthly_stats, year_month == ^target_year_month or year_month in ^yms)
+    |> DF.pivot_wider("year_month", "last", id_columns: [id_col])
+    |> DF.rename(%{to_string(target_year_month) => "target_year_month"})
+    |> DF.mutate(
+      for col <- across(^yms_str) do
+        {"diff_#{col.name}", (target_year_month - col) / col}
+      end
+    )
   end
 end
