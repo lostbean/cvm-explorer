@@ -14,10 +14,10 @@ defmodule CvmExplorer do
     |> DF.concat_rows()
   end
 
-  def deriveMetrics(diario_hist_df, target_year_month, num_months) do
+  def deriveMetrics(diario_hist_df, target_year_month, num_months) when num_months >= 0 do
     date_col = "DT_COMPTC"
     id_col = "CNPJ_FUNDO"
-    reference_year_month = YM.add(target_year_month, num_months)
+    reference_year_month = YM.add(target_year_month, -num_months)
 
     base =
       diario_hist_df
@@ -54,13 +54,13 @@ defmodule CvmExplorer do
 
     full_stats =
       DF.join(d_target_ym, d_ref_ym)
-      |> DF.mutate(
-        year_month: 100 * year(col("last_date")) + month(col("last_date")),
-        m60_value_diff_pct: (last - first) / first
-      )
+      |> DF.mutate(%{
+        "year_month" => 100 * year(col("last_date")) + month(col("last_date")),
+        "m#{^num_months}_value_diff_pct" => (last - first) / first
+      })
 
     full_stats
-    |> DF.rename(first: "m60_value", last: "ref_value")
-    |> DF.select([id_col, "m60_value_diff_pct", "m60_value", "ref_value"])
+    |> DF.rename(first: "m#{num_months}_value", last: "ref_value")
+    |> DF.select([id_col, "m#{num_months}_value_diff_pct", "m#{num_months}_value", "ref_value"])
   end
 end
