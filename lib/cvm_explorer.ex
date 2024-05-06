@@ -14,16 +14,9 @@ defmodule CvmExplorer do
     |> DF.concat_rows()
   end
 
-  @spec deriveMetrics(Explorer.DataFrame.t(), integer(), list() | integer()) ::
-          Explorer.DataFrame.t()
-  def deriveMetrics(diario_hist_df, target_year_month, num_months) when is_integer(num_months) do
-    deriveMetrics(diario_hist_df, target_year_month, [num_months])
-  end
-
-  def deriveMetrics(diario_hist_df, target_year_month, num_months) when is_list(num_months) do
+  def monthly_stats(diario_hist_df) do
     date_col = "DT_COMPTC"
     id_col = "CNPJ_FUNDO"
-    yms = Enum.map(num_months, &YM.add(target_year_month, -&1))
 
     base =
       diario_hist_df
@@ -37,18 +30,30 @@ defmodule CvmExplorer do
 
     values = DF.select(base, [id_col, date_col, "VL_QUOTA"])
 
-    monthly_stats =
-      dates
-      |> DF.join(DF.rename(values, VL_QUOTA: "first"),
-        on: [{id_col, id_col}, {"first_date", date_col}]
-      )
-      |> DF.join(DF.rename(values, VL_QUOTA: "last"),
-        on: [{id_col, id_col}, {"last_date", date_col}]
-      )
-      |> DF.mutate(
-        year_month: 100 * year(col("first_date")) + month(col("first_date")),
-        value_diff_pct: (last - first) / first
-      )
+    dates
+    |> DF.join(DF.rename(values, VL_QUOTA: "first"),
+      on: [{id_col, id_col}, {"first_date", date_col}]
+    )
+    |> DF.join(DF.rename(values, VL_QUOTA: "last"),
+      on: [{id_col, id_col}, {"last_date", date_col}]
+    )
+    |> DF.mutate(
+      year_month: 100 * year(col("first_date")) + month(col("first_date")),
+      value_diff_pct: (last - first) / first
+    )
+  end
+
+  @spec deriveMetrics(Explorer.DataFrame.t(), integer(), list() | integer()) ::
+          Explorer.DataFrame.t()
+  def deriveMetrics(diario_hist_df, target_year_month, num_months) when is_integer(num_months) do
+    deriveMetrics(diario_hist_df, target_year_month, [num_months])
+  end
+
+  def deriveMetrics(diario_hist_df, target_year_month, num_months) when is_list(num_months) do
+    id_col = "CNPJ_FUNDO"
+    yms = Enum.map(num_months, &YM.add(target_year_month, -&1))
+
+    monthly_stats = monthly_stats(diario_hist_df)
 
     yms_str = Enum.map(yms, &to_string(&1))
 
