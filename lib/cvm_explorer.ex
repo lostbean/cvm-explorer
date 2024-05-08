@@ -73,4 +73,20 @@ defmodule CvmExplorer do
       end
     )
   end
+
+  def getCDIBenchmark(num_past_months) do
+    all_df = CvmExplorer.getDiarioFIHistory(num_past_months)
+    cdi_df = CvmExplorer.EconomicalIndicators.dataframe(:cdi)
+    monthly_df = CvmExplorer.monthly_stats(all_df)
+
+    count_df =
+      DF.join(monthly_df, cdi_df, on: [{"year_month", "year_month"}])
+      |> DF.group_by("CNPJ_FUNDO")
+      |> DF.summarise(
+        count_better: sum(if value_diff_pct > valor, do: 1, else: 0),
+        count_worst: sum(if value_diff_pct <= valor, do: 1, else: 0)
+      )
+
+    DF.mutate(count_df, ratio: count_better / count_worst)
+  end
 end
