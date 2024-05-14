@@ -21,7 +21,8 @@ defmodule CvmExplorer.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:explorer, "~> 0.7.1"},
+      # Using main due a recent bug fix - https://github.com/elixir-explorer/explorer/issues/906
+      {:explorer, git: "https://github.com/elixir-explorer/explorer.git", ref: "c64b05c"},
       {:httpoison, "~> 2.2"},
       {:iconv, "~> 1.0"},
       {:zstream, "~> 0.6.4"}
