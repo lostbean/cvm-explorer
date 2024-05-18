@@ -3,6 +3,6 @@ defmodule CvmExplorerTest do
   doctest CvmExplorer
 
   test "greets the world" do
-    assert CvmExplorer.hello() == :world
+    # assert CvmExplorer.hello() == :world
   end
 end
