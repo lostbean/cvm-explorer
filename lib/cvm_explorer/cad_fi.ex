@@ -19,14 +19,14 @@ defmodule CvmExplorer.CadFI do
     nil_values: [""]
   ]
 
-  def download() do
+  def download do
     HTTPStreamer.get(@cad_fi)
     |> Stream.map(&:iconv.convert("ISO-8859-1", "utf-8", &1))
     |> Stream.into(File.stream!(@cad_fi_store_file, encoding: :utf8))
     |> Stream.run()
   end
 
-  def dataframe() do
+  def dataframe do
     if !File.exists?(@cad_fi_store_file), do: download()
     {:ok, cad_fi} = DF.from_csv(@cad_fi_store_file, @explorer_opts)
     cad_fi

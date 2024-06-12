@@ -26,13 +26,11 @@ defmodule HTTPStreamer do
 
   defp handle_async_resp(%HTTPoison.AsyncResponse{id: id} = resp, emit_end) do
     receive do
-      %HTTPoison.AsyncStatus{id: ^id, code: code} ->
-        IO.inspect(code, label: "STATUS: ")
+      %HTTPoison.AsyncStatus{id: ^id, code: _code} ->
         HTTPoison.stream_next(resp)
         {[], resp}
 
-      %HTTPoison.AsyncHeaders{id: ^id, headers: headers} ->
-        IO.inspect(headers, label: "HEADERS: ")
+      %HTTPoison.AsyncHeaders{id: ^id, headers: _headers} ->
         HTTPoison.stream_next(resp)
         {[], resp}
 

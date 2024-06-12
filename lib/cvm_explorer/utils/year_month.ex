@@ -15,10 +15,10 @@ defmodule CvmExplorer.Utils.YearMonth do
   end
 
   @spec diff(integer() | {integer(), integer()}, integer() | {integer(), integer()}) :: integer()
-  def diff({yearA, monthA}, {yearB, monthB}) do
-    ymA = 12 * yearA + (monthA - 1)
-    ymB = 12 * yearB + (monthB - 1)
-    ymA - ymB
+  def diff({year_a, month_a}, {year_b, month_b}) do
+    ym_a = 12 * year_a + (month_a - 1)
+    ym_b = 12 * year_b + (month_b - 1)
+    ym_a - ym_b
   end
 
   def diff(year_monthA, year_monthB) do

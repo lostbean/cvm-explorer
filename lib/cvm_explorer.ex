@@ -77,13 +77,13 @@ defmodule CvmExplorer do
     ])
   end
 
-  @spec deriveMetrics(Explorer.DataFrame.t(), integer(), list() | integer()) ::
+  @spec derive_metrics(Explorer.DataFrame.t(), integer(), list() | integer()) ::
           Explorer.DataFrame.t()
-  def deriveMetrics(diario_hist_df, target_year_month, num_months) when is_integer(num_months) do
-    deriveMetrics(diario_hist_df, target_year_month, [num_months])
+  def derive_metrics(diario_hist_df, target_year_month, num_months) when is_integer(num_months) do
+    derive_metrics(diario_hist_df, target_year_month, [num_months])
   end
 
-  def deriveMetrics(diario_hist_df, target_year_month, num_months) when is_list(num_months) do
+  def derive_metrics(diario_hist_df, target_year_month, num_months) when is_list(num_months) do
     id_col = "cnpj"
     yms = Enum.map(num_months, &YM.add(target_year_month, -&1))
 
