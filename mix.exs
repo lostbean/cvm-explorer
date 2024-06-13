@@ -22,7 +22,7 @@ defmodule CvmExplorer.MixProject do
   defp deps do
     [
       # Using main due a recent bug fix - https://github.com/elixir-explorer/explorer/issues/906
-      {:explorer, git: "https://github.com/elixir-explorer/explorer.git", ref: "c64b05c"},
+      {:explorer, "~> 0.8.3"},
       {:httpoison, "~> 2.2"},
       {:iconv, "~> 1.0"},
       {:zstream, "~> 0.6.4"}
